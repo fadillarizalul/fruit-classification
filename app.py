@@ -4,56 +4,51 @@ import os
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
-import tensorflow_hub as hub
-from PIL import Image
+import matplotlib.pyplot as plt
+from PIL import Image, ImageOps
 
+st.set_option('deprecation.showfileUploaderEncoding', False)
 
 @st.cache(allow_output_mutation=True)
 def load_model():
-  model=tf.keras.models.load_model('model1.h5')
+  model = tf.keras.models.load_model('model1.h5')
   return model
+  
 with st.spinner('Model is being loaded..'):
-  model=load_model()
+  model = load_model()
 
 st.write("""
-         # Fruit Quality Classification
+         # sBuah: Fruit Quality Classification
          """
          )
+st.text('made by CSD-069 Team')
+         
+def predict_class(image, model):
+	image = tf.cast(image, tf.float32)
+	image = tf.image.resize(image, [150, 150])
+	image = np.expand_dims(image, axis = 0)
+	prediction = model.predict(image)
+	return prediction
 
-file = st.file_uploader("Please upload an image of fruit", type=["jpg", "png"])
+model = load_model()
 
-import cv2
-from PIL import Image, ImageOps
-import numpy as np
-st.set_option('deprecation.showfileUploaderEncoding', False)
+st.text('This is a Web to Classify Fruit')
+st.text('The result is whether the fruit is Fresh or Rotten')
 
-def import_and_predict(image_data, model):
-    
-        size = (150,150)    
-        image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
-        image = np.asarray(image)
-        img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        img_reshape = img[np.newaxis,...]
-    
-        prediction = model.predict(img_reshape)
-        
-        return prediction
-
-if __name__ == '__main__':
-    st.write('This is a demo of sBuah app which can classify whether a fruit is Fresh or Rotten')
-    st.write('Please upload an image of fruit to classify.')
-    st.write('The classification result will be displayed.')
+file = st.file_uploader("Upload an image of a fruit", type=["jpg", "png"])
 
 if file is None:
-    st.text("Upload an image of fruit")
+	st.text('Waiting for upload....')
+  
 else:
-    image = Image.open(file)
-    st.image(image, use_column_width=True)
-    predictions = import_and_predict(image, model)
-    score = tf.nn.softmax(predictions[0])
-    st.write(prediction)
-    st.write(score)
-    print(
-    "This image most likely belongs to {} with a {:.2f} percent confidence."
-    .format(class_names[np.argmax(score)], 100 * np.max(score))
-)
+	slot = st.empty()
+	slot.text('Running inference....')
+	test_image = Image.open(file)
+	st.image(test_image, caption="Input Image", width = 400)
+	pred = predict_class(np.asarray(test_image), model)
+	class_names = ['Fresh Banana', 'Fresh Mango', 'Fresh Orange',
+					'Rotten Banana', 'Rotten Mango', 'Rotten Orange']
+	result = class_names[np.argmax(pred)]
+	output = 'The image is a ' + result
+	slot.text('Image has successfully uploaded')
+	st.success(output)
