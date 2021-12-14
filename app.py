@@ -4,7 +4,6 @@ import os
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image, ImageOps
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
