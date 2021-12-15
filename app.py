@@ -10,7 +10,7 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 
 @st.cache(allow_output_mutation=True)
 def load_model():
-  model = tf.keras.models.load_model('model1.h5')
+  model = tf.keras.models.load_model('model.h5')
   return model
   
 with st.spinner('Model is being loaded..'):
